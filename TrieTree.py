@@ -8,6 +8,7 @@ LeetCode677 键值映射
 
 
 import collections
+from collections import deque
 
 # TrieSet LeetCode208 实现前缀树
 # 只需要判断是否是结尾，不需要存储value
@@ -118,3 +119,133 @@ class Solution:
                 words[i] = prefix
         return ' '.join(words)
 
+
+# 字典写法
+class TrieDic1:
+
+    def __init__(self):
+        self.root = {}
+
+    def insert(self, word):
+        node = self.root
+        for c in word:
+            if c not in node:
+                node[c] = {}
+            node = node[c]
+        node['#'] ={}
+
+    def find_sp(self, word):
+        node = self.root
+        for i in range(len(word)):
+            if '#' in node:
+                return word[:i]
+            if word[i] in node:
+                node = node[word[i]]
+            else:
+                break
+        return word
+
+class Solution:
+
+    def replaceWords(self, dictionary: list[str], sentence: str) -> str:
+        trie = TrieDic1()
+        for dic in dictionary:
+            trie.insert(dic)
+        words = sentence.split(' ')
+        return ' '.join(trie.find_sp(word) for word in words)
+
+
+# LeetCode 211 添加与搜索单词
+# TrieNode 方法
+class WordDictionary:
+
+    def __init__(self):
+        self.root = TrieNode()
+
+
+    def addWord(self, word: str) -> None:
+        node = self.root
+        for c in word:
+            node = node.children[c]
+        node.isEnd = True
+
+
+    def search(self, word: str) -> bool:
+        return self.match(word, 0, self.root)
+
+    def match(self, word, idx, root):
+        if not root:
+            return False
+        if idx == len(word):
+            return root.isEnd
+        if word[idx] != '.':
+            return self.match(word, idx + 1, root.children.get[word[idx]])
+        else:
+            for child in root.children.values():
+                if self.match(word, idx + 1, child.child):
+                    return True
+        return False
+
+
+# 字典方法
+class WordDictionary:
+
+    def __init__(self):
+        self.root = {}
+
+    def addWord(self, word: str) -> None:
+        node = self.root
+        for c in word:
+            if c not in node:
+                node[c] = {}
+            node = node[c]
+        node['#'] = {}
+
+    def search(self, word: str) -> bool:
+        word += '#'
+        bfs = deque([(0, self.root)])
+        while bfs:
+            idx, cur = bfs.popleft()
+            if idx == len(word):
+                return True
+            if word[idx] == '.':
+                for nxt in cur.values():
+                    bfs.append((idx + 1, nxt))
+            elif word[idx] in cur:
+                bfs.append((idx + 1, cur[word[idx]]))
+        return False
+
+
+# 677 键值映射
+# 字典方法
+class MapSum:
+
+    def __init__(self):
+        self.root = {}
+
+    def insert(self, key: str, val: int) -> None:
+        node = self.root
+        for c in key:
+            if c not in node:
+                node[c] = {}
+            node = node[c]
+        node['val'] = val
+
+
+    def sum(self, prefix: str) -> int:
+        node = self.root
+        for c in prefix:
+            if c not in node:
+                return 0
+            else:
+                node = node[c]
+        ans = 0
+        def dfs(node):
+            for c in node:
+                if c == 'val':
+                    nonlocal ans
+                    ans += node[c]
+                else:
+                    dfs(node[c])
+        dfs(node)
+        return ans
